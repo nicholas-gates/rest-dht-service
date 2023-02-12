@@ -1,0 +1,6 @@
+{
+  "search.exclude": {
+    "**/.sst": true
+  },
+  "prettier.configPath": ".prettierrc.json"
+}

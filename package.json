@@ -1,0 +1,28 @@
+{
+  "name": "rest-services",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "aws-cdk-lib": "^2.64.0",
+    "constructs": "^10.1.251",
+    "prettier": "^2.8.4",
+    "sst": "^2.0.16",
+    "typescript": "^4.9.5"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "faunadb": "^4.7.1"
+  }
+}
