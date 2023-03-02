@@ -1,0 +1,66 @@
+// create a singleton typescript class
+import { client, q } from "src/lib/fauna-client";
+
+interface PaginationOptions {
+  size?: number;
+  after?: any[];
+}
+export class Dht {
+
+  readonly collection: string = "myCollection";
+
+  private static _instance: Dht;
+
+  // getById: (id: string) => Promise<any> = async (id: string) => {
+  //   // const collection = "myCollection";
+  //   const resp = await client.query(q.Get(q.Ref(q.Collection(this.collection), id)));
+  //   console.log(resp);
+  //   return resp;
+  // };
+
+  // create a singleton typescript class
+  // static get instance() {
+  //   if (!this._instance) {
+  //     this._instance = new Dht();
+  //   }
+  //   return this._instance;
+  // }
+
+  list = async (after:string) => {
+
+  // list: (after: string) => Promise<any> = async (after: string) => {
+    // const collection = "myCollection";
+
+    const paginationOptions: PaginationOptions = {
+      // size: 1,
+    };
+
+    if (after) {
+      paginationOptions.after = [q.Ref(q.Collection(this.collection), after)];
+    }
+
+    const alldocs = await client.query(
+      q.Map(
+        q.Paginate(q.Match(q.Index("all_docs")), paginationOptions),
+        q.Lambda("X", q.Get(q.Var("X")))
+      )
+    );
+
+    // extract the title from the document
+    const titles = alldocs.data.map((doc: any) => doc.data);
+
+    return titles;
+  };
+
+  // create: (data: object) => Promise<any> = async (data: object) => {
+  //   // const collection = "myCollection";
+
+  //   const resp = await client.query(
+  //     q.Create(q.Ref(q.Collection(this.collection), q.NewId()), {
+  //       data: data,
+  //     })
+  //   );
+
+  //   return resp;
+  // };
+}

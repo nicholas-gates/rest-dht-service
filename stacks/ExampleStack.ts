@@ -9,7 +9,7 @@ export function ExampleStack({ stack }: StackContext) {
       "GET /notes/{id}": "packages/functions/src/note/get.main",
       "PUT /notes/{id}": "packages/functions/src/note/update.main",
       "GET /dht": "packages/functions/src/dht/list.main",
-      "GET /dht/{id}": "packages/functions/src/dht/get.main",
+      "GET /dht/{id}": "packages/functions/src/dht/get/index.handler",
       "POST /dht": "packages/functions/src/dht/create.main",
       "DELETE /dht/{id}": "packages/functions/src/dht/delete.main",
     },

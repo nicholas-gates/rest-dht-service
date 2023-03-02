@@ -1,34 +1,53 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { client, q } from "src/lib/fauna-client";
 
-export const main: APIGatewayProxyHandlerV2 = async (event: any) => {
-  try {
-    const collection = "myCollection";
+import middy from "@middy/core";
+import httpJsonBodyParser from "@middy/http-json-body-parser";
+import httpErrorHandler from "@middy/http-error-handler";
 
-    const resp = await client.query(
-      q.Create(q.Ref(q.Collection(collection), q.NewId()), {
-        data: JSON.parse(event.body),
-      })
-    );
+import validator from "@middy/validator";
+import { transpileSchema } from "@middy/validator/transpile";
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(resp.data),
-      headers: {
-        "Content-Type": "application/json",
+import response from "src/lib/response";
+import { Dht } from "src/dht/actors/Dht";
+const dht = Dht.instance;
+
+const schema = {
+  type: "object",
+  required: ["body"],
+  properties: {
+    // this will pass validation
+    body: {
+      type: "object",
+      required: ["title"],
+      properties: {
+        title: {
+          type: "string",
+        },
       },
-    };
-  } catch (err: any) {
-    console.error(
-      "Error: [%s] %s: %s",
-      err.name,
-      err.message,
-    );
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: true, post: true }),
-    };
-    // }
-  }
+    },
+  },
 };
+
+export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
+  try {
+    const resp = await dht.create(event.body);
+
+    return response({
+      body: resp.data,
+    });
+  } catch (err: any) {
+    console.error("Error: [%s] %s: %s", err.name, err.message);
+
+    return response({
+      statusCode: 500,
+      body: { error: true, post: true },
+    });
+  }
+})
+  .use(httpErrorHandler())
+  .use(httpJsonBodyParser())
+  .use(
+    validator({
+      eventSchema: transpileSchema(schema),
+    })
+  );

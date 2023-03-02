@@ -28,4 +28,3 @@ export const client = new faunadb.Client({
 });
 
 export const q = faunadb.query;
-

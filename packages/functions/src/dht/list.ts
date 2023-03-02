@@ -1,51 +1,56 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { client, q } from "src/lib/fauna-client";
+import response from "src/lib/response";
 
-interface PaginationOptions {
-  size?: number;
-  after?: any[];
-}
+import { list } from "./actors/Dht";
 
-export const main: APIGatewayProxyHandlerV2 = async (event: any) => {
+// import validator from "@middy/validator";
+// import { transpileSchema } from "@middy/validator/transpile";
+
+import middy from "@middy/core";
+import httpErrorHandler from "@middy/http-error-handler";
+import httpEventNormalizer from "@middy/http-event-normalizer";
+import httpHeaderNormalizer from "@middy/http-header-normalizer";
+import cors from "@middy/http-cors";
+
+const schema = {
+  type: "object",
+  required: ["body", "foo"],
+  properties: {
+    // this will pass validation
+    body: {
+      type: "string",
+    },
+    // this won't as it won't be in the event
+    foo: {
+      type: "string",
+    },
+  },
+};
+
+export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   try {
-    const collection = "myCollection";
-
-    const paginationOptions: PaginationOptions = {
-      // size: 1,
-    };
-
-    if (event.queryStringParameters?.after) {
-      paginationOptions.after = [
-        q.Ref(q.Collection("myCollection"), event.queryStringParameters.after),
-      ];
-    }
-
-    const alldocs = await client.query(
-      q.Map(
-        q.Paginate(q.Match(q.Index("all_docs")), paginationOptions),
-        q.Lambda("X", q.Get(q.Var("X")))
-      )
-    );
+    const { docData, after } = await list(event.queryStringParameters?.after);
 
     // extract the title from the document
-    const titles = alldocs.data.map((doc: any) => doc.data);
+    // const titles = docData.map((doc: any) => doc.title);
 
-    const x_after = alldocs?.after ? alldocs.after[0].id : null;
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(titles),
+    return response({
+      body: docData,
       headers: {
-        "Content-Type": "application/json",
-        "x-after": `${x_after}`,
+        "X-After": after,
       },
-    };
+    });
   } catch (err: any) {
     console.error("Error: [%s] %s: %s", err.name, err.message);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: true, post: true }),
-    };
+    throw err;
   }
-};
+})
+  .use(httpHeaderNormalizer())
+  .use(httpEventNormalizer())
+  .use(httpErrorHandler())
+  // .use(
+  //   validator({
+  //     eventSchema: transpileSchema(schema),
+  //   })
+  // )
+  .use(cors());
