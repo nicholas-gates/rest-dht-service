@@ -1,8 +1,6 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import response from "src/lib/response";
-// import { DhtGet } from "./DhtGet";
-// import {Dht} from "src/dht/actors/Dht";
-// const dht = Dht.instance;
+
 import { getById } from "./actors/Dht";
 
 import middy from "@middy/core";
@@ -24,12 +22,12 @@ const schema = {
   },
 };
 
-const handler: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
+export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   try {
-    const resp = await getById(event.pathParameters.id);
+    const doc = await getById(event.pathParameters.id);
 
     return response({
-      body: resp.data,
+      body: doc,
     });
   } catch (err: any) {
     console.error("Error: [%s] %s: %s", err.name, err.message);
@@ -56,5 +54,3 @@ const handler: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
       eventSchema: transpileSchema(schema),
     })
   );
-
-export default handler;
