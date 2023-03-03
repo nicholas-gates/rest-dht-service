@@ -29,15 +29,13 @@ const schema = {
 
 export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   try {
-    const { docData, after } = await list(event.queryStringParameters?.after);
-
-    // extract the title from the document
-    // const titles = docData.map((doc: any) => doc.title);
+    const { docs, before, after } = await list(event.queryStringParameters?.after);
 
     return response({
-      body: docData,
+      body: docs,
       headers: {
         "X-After": after,
+        "X-Before": before,
       },
     });
   } catch (err: any) {

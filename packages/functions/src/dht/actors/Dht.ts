@@ -30,14 +30,22 @@ export const list: (after: string) => Promise<any> = async (after: string) => {
     )
   );
 
-  // extract the title from the document
-  const docData = alldocs.data.map((doc: any) => doc.data);
+  const allDocsFlattened = alldocs.data.map((doc: any) => {
+    return {
+      ...doc.data,
+      ...{
+        id: doc.ref.value.id,
+      },
+    };
+  });
 
   const nextAfter: string = alldocs?.after ? alldocs.after[0].id : null;
+  const nextBefore: string = alldocs?.before ? alldocs.before[0].id : null;
 
   return {
-    docData,
+    docs: allDocsFlattened, // alldocs.data,
     after: nextAfter,
+    before: nextBefore,
   };
 };
 
