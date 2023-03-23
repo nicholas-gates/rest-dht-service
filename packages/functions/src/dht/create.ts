@@ -8,8 +8,7 @@ import validator from "@middy/validator";
 import { transpileSchema } from "@middy/validator/transpile";
 
 import response from "src/lib/response";
-import { Dht } from "src/dht/actors/Dht";
-const dht = Dht.instance;
+import { create } from "src/dht/actors/Dht";
 
 const schema = {
   type: "object",
@@ -30,7 +29,7 @@ const schema = {
 
 export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   try {
-    const resp = await dht.create(event.body);
+    const resp = await create(event.body);
 
     return response({
       body: resp.data,
