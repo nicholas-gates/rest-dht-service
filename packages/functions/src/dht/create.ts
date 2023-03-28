@@ -46,9 +46,9 @@ export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   }
 })
   .use(httpErrorHandler())
-  .use(httpJsonBodyParser())
-  .use(
-    validator({
-      eventSchema: transpileSchema(schema),
-    })
-  );
+  .use(httpJsonBodyParser());
+// .use(
+//   validator({
+//     eventSchema: transpileSchema(schema),
+//   })
+// )

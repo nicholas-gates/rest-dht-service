@@ -6,7 +6,7 @@ interface PaginationOptions {
   after?: any[];
 }
 
-const collection: string = "myCollection";
+const collection: string = "dhtReading";
 
 export const getById: (id: string) => Promise<any> = async (id: string) => {
   const dbdoc = await client.query(q.Get(q.Ref(q.Collection(collection), id)));
@@ -45,9 +45,14 @@ export const list: (after: string) => Promise<any> = async (after: string) => {
 };
 
 export const create: (data: object) => Promise<any> = async (data: object) => {
+  const now = q.Now();
   const resp = await client.query(
     q.Create(q.Ref(q.Collection(collection), q.NewId()), {
-      data: data,
+      data: {
+        ...data,
+        created_at: now,
+        modified_at: now,
+      },
     })
   );
 
