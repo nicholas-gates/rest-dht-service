@@ -50,8 +50,8 @@ export const create: (data: object) => Promise<any> = async (data: object) => {
     q.Create(q.Ref(q.Collection(collection), q.NewId()), {
       data: {
         ...data,
-        created_at: now,
-        modified_at: now,
+        createdAt: now,
+        modifiedAt: now,
       },
     })
   );

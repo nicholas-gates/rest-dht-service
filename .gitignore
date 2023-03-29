@@ -14,3 +14,5 @@ node_modules
 .faunarc
 
 .sst.config.*.mjs
+
+scratch/**/*
