@@ -16,7 +16,12 @@
 		"extensions": [
 			"fauna.fauna",
 			"alefragnani.Bookmarks",
-			"wmaurer.change-case"
+			"wmaurer.change-case",
+			"mhutchie.git-graph",
+			"GitHub.copilot",
+			"VisualStudioExptTeam.vscodeintellicode",
+			"esbenp.prettier-vscode",
+			"buenon.scratchpads"
 		]
 	}
 }

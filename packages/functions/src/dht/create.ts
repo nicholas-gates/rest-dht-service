@@ -8,8 +8,6 @@ import validator from "@middy/validator";
 import { transpileSchema } from "@middy/validator/transpile";
 
 import response from "src/lib/response";
-// import { Dht } from "src/dht/actors/Dht";
-// const dht = Dht.instance;
 import { create } from "./actors/Dht";
 
 const schema = {

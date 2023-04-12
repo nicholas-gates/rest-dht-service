@@ -39,7 +39,7 @@ export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
       },
     });
   } catch (err: any) {
-    console.error("Error: [%s] %s: %s", err.name, err.message);
+    console.error("Error: [%s] %s", err.name, err.message);
     throw err;
   }
 })

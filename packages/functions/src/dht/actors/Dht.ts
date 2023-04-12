@@ -6,7 +6,7 @@ interface PaginationOptions {
   after?: any[];
 }
 
-const collection: string = "dhtReading";
+const collection: string = "DhtReading";
 
 export const getById: (id: string) => Promise<any> = async (id: string) => {
   const dbdoc = await client.query(q.Get(q.Ref(q.Collection(collection), id)));
@@ -27,7 +27,7 @@ export const list: (after: string) => Promise<any> = async (after: string) => {
 
   const dbdocs = await client.query(
     q.Map(
-      q.Paginate(q.Match(q.Index("all_docs")), paginationOptions),
+      q.Paginate(q.Match(q.Index("AllDhtDocs")), paginationOptions),
       q.Lambda("X", q.Get(q.Var("X")))
     )
   );
