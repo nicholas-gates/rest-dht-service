@@ -5,7 +5,6 @@ input DhtReadingInput {
   humidity: Float!
   createdAt: Time!
   modifiedAt: Time!
-  id: ID!
 }
 
 # 'DhtReading' input values
@@ -15,26 +14,17 @@ input PartialUpdateDhtReadingInput {
   humidity: Float
   createdAt: Time
   modifiedAt: Time
-  id: ID
 }
 
 type DhtReading {
   tempFahr: Float!
-
-  # The document's ID.
   tempCel: Float!
-  id: ID!
   humidity: Float!
   modifiedAt: Time!
   createdAt: Time!
 }
 
 type Query {
-  # Find a document from the collection of 'DhtReading' by its id.
-  findDhtReadingByID(
-    # The 'DhtReading' document's ID
-    id: ID!
-  ): DhtReading
 
   getDhtReadingsByTimeRange(
     startTs: String!
@@ -43,7 +33,6 @@ type Query {
 }
 
 type DhtReadingOutput {
-  id: ID!
   tempFahr: Float!
   tempCel: Float!
   humidity: Float!
