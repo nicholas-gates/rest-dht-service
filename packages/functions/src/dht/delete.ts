@@ -8,7 +8,7 @@ interface PaginationOptions {
 
 export const main: APIGatewayProxyHandlerV2 = async (event: any) => {
   try {
-    const collection = "myCollection";
+    const collection = "dhtReading";
 
     // extract id from pathParameters
     const { id } = event.pathParameters;
@@ -16,11 +16,11 @@ export const main: APIGatewayProxyHandlerV2 = async (event: any) => {
     let paginationOptions =
       id === "*"
         ? {}
-        : { size: 1, after: [q.Ref(q.Collection("myCollection"), id)] };
+        : { size: 1, after: [q.Ref(q.Collection("dhtReading"), id)] };
 
     const alldocs = await client.query(
       q.Map(
-        q.Paginate(q.Match(q.Index("all_docs")), paginationOptions),
+        q.Paginate(q.Match(q.Index("all_readings")), paginationOptions),
         q.Lambda(["ref"], q.Delete(q.Var("ref")))
       )
     );

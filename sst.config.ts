@@ -1,14 +1,14 @@
 import { SSTConfig } from "sst";
-import { ExampleStack } from "./stacks/ExampleStack"
+import { DhtRestStack } from "./stacks/DhtRestStack";
 
 export default {
   config(_input) {
     return {
-      name: "rest-services",
-      region: "us-east-1",
+      name: "dht-rest-services",
+      region: "us-east-2",
     };
   },
   stacks(app) {
-    app.stack(ExampleStack)
+    app.stack(DhtRestStack);
   },
 } satisfies SSTConfig;

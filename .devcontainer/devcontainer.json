@@ -1,0 +1,23 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      "upgradePackages": true,
+      "packages": ""
+    },
+    "ghcr.io/devcontainers-contrib/features/typescript:2": {
+      "version": "latest"
+    },
+    "ghcr.io/dhoeric/features/act:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {}
+},
+"customizations": {
+	"vscode": {
+		"extensions": [
+			"fauna.fauna",
+			"alefragnani.Bookmarks",
+			"wmaurer.change-case"
+		]
+	}
+}
+}

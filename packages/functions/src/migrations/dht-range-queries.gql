@@ -1,0 +1,48 @@
+# fql will return data: Call("getDhtReadingsByTimeRange", '2023-02-29T00:01:24.697092Z', '2023-06-29T00:01:24.697092Z')
+# fql will not return data: Call("getDhtReadingsByTimeRange", '2022-03-29T00:01:24.697092Z', '2022-03-29T00:01:24.697092Z')
+
+# fauna db function to retrieve readings by data range
+Query(
+  Lambda(
+    ["startTs", "endTs"],
+    Select(
+    ["data"],
+    Map(
+    Paginate(
+        Range(
+        Match(
+            Index("DhtReadingFields"),
+        ),
+        [
+            Time(Var("startTs")),
+        ],
+        [
+            Time(Var("endTs")),
+        ]
+        )
+    ),
+    Lambda(
+        ["createdAt", "modifiedAt", "tempFahr", "tempCel","humidity", "ref"],
+        Let(
+          {
+            dhtReading: Get(Var("ref"))
+             },
+            Var("dhtReading")
+        )
+      )
+    )
+  )
+)
+)
+
+# graphql query to retrieve readings by data range
+query {
+  getDhtReadingsByTimeRange(startTs: "2022-03-29T00:01:24.697092Z", endTs: "2022-03-29T00:01:24.697092Z") {
+    id
+    tempFahr
+    tempCel
+    humidity
+    modifiedAt
+    createdAt
+  }
+}

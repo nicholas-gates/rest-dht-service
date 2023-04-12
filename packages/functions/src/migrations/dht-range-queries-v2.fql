@@ -1,0 +1,228 @@
+////////////////////////////////////////
+// Create a collection
+CreateCollection({
+  name: "dhtReading"
+})
+
+////////////////////////////////////////
+// add some test data
+Create(
+  Collection("dhtReading"),
+  {
+    data: {
+      createdAt: Time("2020-09-25T10:00:00Z"),
+      type: "tempF",
+      value: 72.5
+    }
+  }
+)
+
+Create(
+  Collection("dhtReading"),
+  {
+    data: {
+      createdAt: Time("2020-09-25T05:00:00Z"),
+      type: "tempC",
+      value: 32.5
+    }
+  }
+)
+
+Create(
+  Collection("dhtReading"),
+  {
+    data: {
+      createdAt: Time("2021-09-25T10:00:00Z"),
+      type: "tempC",
+      value: 22.5
+    }
+  }
+)
+
+////////////////////////////////////////
+// Create an index
+CreateIndex({
+  name: "readings_fields_by_tempFahr",
+  source: Collection("dhtReading"),
+  values: [
+    {field: ["data", "createdAt"]},
+    {field: ["data", "modifiedAt"]},
+    {field: ["data", "tempFahr"]},
+    {field: ["data", "tempCel"]},
+    {field: ["data", "humidity"]},
+    {field: ["ref"]}
+  ],
+  terms: [
+    {field: ["data", "tempFahr"]},
+  ]
+})
+
+
+
+////////////////////////////////////////
+Paginate(
+  Match(
+    Index("readings_fields_by_tempFahr"),
+    79
+  )
+)
+
+////////////////////////////////////////
+// Query for array of data
+Paginate(
+  Range(
+    Match(
+      Index("readings_fields_by_tempFahr"),
+      79
+    ),
+    [
+      Time("2023-03-29T00:01:24.697092Z"),
+    ],
+    [
+      Time("2023-03-29T00:01:24.697092Z"),
+    ]
+  )
+)
+
+// designed to return no data
+Paginate(
+  Range(
+    Match(
+      Index("readings_fields_by_tempFahr"),
+      79
+    ),
+    [
+      Time("2022-03-29T00:01:24.697092Z"),
+    ],
+    [
+      Time("2022-03-29T00:01:24.697092Z"),
+    ]
+  )
+)
+
+////////////////////////////////////////
+// Query for array of documents
+Map(
+  Paginate(
+    Range(
+      Match(
+        Index("readings_fields_by_tempFahr"),
+        79
+      ),
+      [
+        Time("2023-03-29T00:01:24.697092Z"),
+      ],
+      [
+        Time("2023-03-29T00:01:24.697092Z"),
+      ]
+    )
+  ),
+  Lambda(
+    ["createdAt", "modifiedAt", "tempFahr", "tempCel","humidity", "ref"],
+    Get(Var("ref"))
+  )
+)
+
+////////////////////////////////////////////////////
+// PART 2: Query for readings by date range only
+
+////////////////////////////////////////
+// Create an index
+CreateIndex({
+  name: "readings_fields",
+  source: Collection("dhtReading"),
+  values: [
+    {field: ["data", "createdAt"]},
+    {field: ["data", "modifiedAt"]},
+    {field: ["data", "tempFahr"]},
+    {field: ["data", "tempCel"]},
+    {field: ["data", "humidity"]},
+    {field: ["ref"]}
+  ]
+})
+
+////////////////////////////////////////
+Paginate(
+  Match(
+    Index("readings_fields")
+  )
+)
+
+////////////////////////////////////////
+// Query for array of data
+Paginate(
+  Range(
+    Match(
+      Index("readings_fields")
+    ),
+    [
+      Time("2023-03-29T00:01:24.697092Z"),
+    ],
+    [
+      Time("2023-03-29T00:01:24.697092Z"),
+    ]
+  )
+)
+
+// designed to return no data
+Paginate(
+  Range(
+    Match(
+      Index("readings_fields_by_tempFahr")
+    ),
+    [
+      Time("2022-03-29T00:01:24.697092Z"),
+    ],
+    [
+      Time("2022-03-29T00:01:24.697092Z"),
+    ]
+  )
+)
+
+////////////////////////////////////////
+// Query for array of documents
+Map(
+  Paginate(
+    Range(
+      Match(
+        Index("readings_fields"),
+      ),
+      [
+      Time("2023-03-29T00:01:24.697092Z"),
+    ],
+    [
+      Time("2023-03-29T00:01:24.697092Z"),
+      ]
+    )
+  ),
+  Lambda(
+    ["createdAt", "modifiedAt", "tempFahr", "tempCel","humidity", "ref"],
+    Get(Var("ref"))
+  )
+)
+
+////////////////////////////////////////////////////
+// Part 3: A example GraphQL query of Part 2
+
+// type Query {
+//   readingsByDateRange(
+//     created_at: String!
+//     modified_at: String!
+//   ): [DhtReading!]! @index(name: "readings_fields")
+// }
+
+query {
+  readings_fields(
+    created_at: "2023-03-29T00:01:24.697092Z"
+    modified_at: "2023-03-29T00:01:24.697092Z"
+  ) {
+    data {
+      createdAt
+      modifiedAt
+      tempFahr
+      tempCel
+      humidity
+    }
+  }
+}
+

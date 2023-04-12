@@ -8,7 +8,9 @@ import validator from "@middy/validator";
 import { transpileSchema } from "@middy/validator/transpile";
 
 import response from "src/lib/response";
-import { create } from "src/dht/actors/Dht";
+// import { Dht } from "src/dht/actors/Dht";
+// const dht = Dht.instance;
+import { create } from "./actors/Dht";
 
 const schema = {
   type: "object",
@@ -44,9 +46,9 @@ export const main: APIGatewayProxyHandlerV2 = middy(async (event: any) => {
   }
 })
   .use(httpErrorHandler())
-  .use(httpJsonBodyParser())
-  .use(
-    validator({
-      eventSchema: transpileSchema(schema),
-    })
-  );
+  .use(httpJsonBodyParser());
+// .use(
+//   validator({
+//     eventSchema: transpileSchema(schema),
+//   })
+// )
