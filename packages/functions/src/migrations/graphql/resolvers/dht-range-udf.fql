@@ -35,14 +35,3 @@ Query(
 )
 )
 
-# graphql query to retrieve readings by data range
-query {
-  getDhtReadingsByTimeRange(startTs: "2022-03-29T00:01:24.697092Z", endTs: "2022-03-29T00:01:24.697092Z") {
-    id
-    tempFahr
-    tempCel
-    humidity
-    modifiedAt
-    createdAt
-  }
-}

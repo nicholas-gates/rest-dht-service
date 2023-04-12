@@ -1,0 +1,14 @@
+type DhtReading {
+  tempFahr: Float!
+  tempCel: Float!
+  humidity: Float!
+  modifiedAt: Time!
+  createdAt: Time!
+}
+
+type Query {
+  getDhtReadingsByTimeRange(
+    startTs: String!
+    endTs: String!
+  ): [DhtReading] @resolver
+}

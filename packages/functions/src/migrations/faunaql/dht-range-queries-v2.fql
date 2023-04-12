@@ -1,8 +1,4 @@
-////////////////////////////////////////
-// Create a collection
-CreateCollection({
-  name: "dhtReading"
-})
+
 
 ////////////////////////////////////////
 // add some test data
@@ -39,23 +35,7 @@ Create(
   }
 )
 
-////////////////////////////////////////
-// Create an index
-CreateIndex({
-  name: "readings_fields_by_tempFahr",
-  source: Collection("dhtReading"),
-  values: [
-    {field: ["data", "createdAt"]},
-    {field: ["data", "modifiedAt"]},
-    {field: ["data", "tempFahr"]},
-    {field: ["data", "tempCel"]},
-    {field: ["data", "humidity"]},
-    {field: ["ref"]}
-  ],
-  terms: [
-    {field: ["data", "tempFahr"]},
-  ]
-})
+
 
 
 

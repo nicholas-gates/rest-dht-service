@@ -1,0 +1,60 @@
+# graphql query to retrieve readings by data range
+query {
+  getDhtReadingsByTimeRange(
+    startTs: "2022-03-29T00:01:24.697092Z"
+    endTs: "2022-03-29T00:01:24.697092Z"
+  ) {
+    id
+    tempFahr
+    tempCel
+    humidity
+    modifiedAt
+    createdAt
+  }
+}
+
+
+query {
+  getDhtReadingsByTimeRange(
+    startTs: "2023-03-19T00:01:24.697092Z"
+    endTs: "2023-06-30T00:01:24.697092Z"
+  ) {
+    tempFahr
+    createdAt
+  }
+}
+
+query {
+  getDhtReadingsByTimeRange(
+    startTs: "2021-03-19T00:01:24.697092Z"
+    endTs: "2021-06-30T00:01:24.697092Z"
+  ) {
+    _id
+    tempFahr
+    tempCel
+    humidity
+    modifiedAt
+    createdAt
+  }
+}
+
+mutation {
+  createDhtReading(
+    data: {
+      id: 30
+      tempFahr: 99
+      tempCel: 12
+      humidity: 84
+      createdAt: "2023-05-29T00:01:24.697092Z"
+      modifiedAt: "2023-06-29T00:01:24.697092Z"
+    }
+  ) {
+    modifiedAt
+    tempFahr
+    tempCel
+    id
+    humidity
+    createdAt
+  }
+}
+

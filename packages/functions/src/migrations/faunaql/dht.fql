@@ -1,0 +1,25 @@
+// NOTE: THESE ARE BETTER DONE THROUGH GRAPHQL SCHEMA
+
+////////////////////////////////////////
+// Create a collection
+CreateCollection({
+  name: "DhtReading"
+})
+
+////////////////////////////////////////
+// Create an index
+CreateIndex({
+  name: "readings_fields_by_tempFahr",
+  source: Collection("DhtReading"),
+  values: [
+    {field: ["data", "createdAt"]},
+    {field: ["data", "modifiedAt"]},
+    {field: ["data", "tempFahr"]},
+    {field: ["data", "tempCel"]},
+    {field: ["data", "humidity"]},
+    {field: ["ref"]}
+  ],
+  terms: [
+    {field: ["data", "tempFahr"]},
+  ]
+})
