@@ -1,4 +1,4 @@
-import { Api, StackContext } from "sst/constructs";
+import { Api, StackContext, NextjsSite } from "sst/constructs";
 
 export function DhtRestStack({ stack }: StackContext) {
   // Create the HTTP API
@@ -15,8 +15,15 @@ export function DhtRestStack({ stack }: StackContext) {
     },
   });
 
+  // Create the Next.js site
+  // https://docs.sst.dev/constructs/NextjsSite#while-developing
+  // const site = new NextjsSite(stack, "Site", {
+  //   path: "dht-frontend/",
+  // });
+
   // Show the API endpoint in the output
   stack.addOutputs({
     ApiEndpoint: api.url,
+    // URL: site.url,
   });
 }
