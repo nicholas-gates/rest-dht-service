@@ -16,3 +16,6 @@ node_modules
 .sst.config.*.mjs
 
 scratch/**/*
+
+# ignore old dirs
+old_*
