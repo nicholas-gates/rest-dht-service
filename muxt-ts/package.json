@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.12",
+    "@clerk/nextjs": "^4.16.4",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
     "@emotion/server": "^11.4.0",
