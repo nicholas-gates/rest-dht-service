@@ -6,11 +6,16 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  TextField,
 } from "@mui/material";
 
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 import MainLayout from "./layouts/MainLayout";
+
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 // create an interface for reading data
 interface ReadingProps {
@@ -26,7 +31,17 @@ interface ReadingsProps {
   readings: ReadingProps[];
 }
 
-export default function Home({ readings }: ReadingsProps) {
+export default function DHTTable({ readings }: ReadingsProps) {
+  const [earliestDate, setEarliestDate] = useState(null);
+  const [latestDate, setLatestDate] = useState(null);
+
+  const handleEarliestDateChange = (date: any) => {
+    setEarliestDate(date);
+  };
+
+  const handleLatestDateChange = (date: any) => {
+    setLatestDate(date);
+  };
 
   return (
     <MainLayout>
@@ -40,7 +55,6 @@ export default function Home({ readings }: ReadingsProps) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* // create table rows for each reading */}
           {readings.map((reading) => (
             <TableRow key={reading._id}>
               <TableCell>{reading._id}</TableCell>
@@ -51,6 +65,22 @@ export default function Home({ readings }: ReadingsProps) {
           ))}
         </TableBody>
       </Table>
+
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateTimePicker
+          label="Earliest Date"
+          value={earliestDate}
+          onChange={handleEarliestDateChange}
+        />
+      </LocalizationProvider>
+
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateTimePicker
+          label="Latest Date"
+          value={latestDate}
+          onChange={handleLatestDateChange}
+        />
+      </LocalizationProvider>
     </MainLayout>
   );
 }

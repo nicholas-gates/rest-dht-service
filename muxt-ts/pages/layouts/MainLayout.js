@@ -13,22 +13,48 @@ import {
     Container,
 
 } from "@mui/material";
+import { useClerk } from '@clerk/clerk-react';
 import Stack from "@mui/joy/Stack";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ListIcon from "@mui/icons-material/List";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const MainLayout = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { user, openSignIn, signOut } = useClerk();
 
     const toggleDrawer = () => {
         setIsOpen(!isOpen);
+    };
+
+    const handleLoginToggle = () => {
+        if (user) {
+            signOut().then(() => {
+                window.location.href = '/';
+            });
+        } else {
+            openSignIn({
+                signUpHref: '/signup',
+                signInHref: '/signin',
+                forgotPasswordHref: '/forgot-password',
+            });
+        }
     };
 
     return (
         <Container>
             <Drawer open={isOpen} onClose={toggleDrawer}>
                 <List>
+
+                    <ListItem button onClick={handleLoginToggle}>
+                        <ListItemIcon>
+                            {user ? <ExitToAppIcon /> : <AccountCircleIcon />}
+                        </ListItemIcon>
+                        <ListItemText primary={user ? 'Signoff' : 'Sign in'} />
+                    </ListItem>
+
                     <ListItem>
                         <ListItemIcon>
                             <DashboardIcon />
@@ -64,5 +90,7 @@ const MainLayout = ({ children }) => {
         </Container>
     );
 };
+
+
 
 export default MainLayout;
