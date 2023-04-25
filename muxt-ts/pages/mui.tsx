@@ -1,81 +1,85 @@
-import React, { Component } from 'react';
+import React, { useRef } from "react";
 
-import {
-  Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Container,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ListIcon from '@mui/icons-material/List';
+import { Controller, useForm } from "react-hook-form";
+import { Button, TextField } from "@mui/material";
 
-export default function MyComponent() {
-  return (
-    <Box>
-      <AppBar>
-        <Toolbar>
-          <IconButton>
-            <MenuIcon />
-          </IconButton>
-          <Typography>My App</Typography>
-        </Toolbar>
-      </AppBar>
-
-      <Drawer>
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText>Dashboard</ListItemText>
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <ListIcon />
-            </ListItemIcon>
-            <ListItemText>Tables</ListItemText>
-          </ListItem>
-        </List>
-      </Drawer>
-      <Container>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Price</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>1</TableCell>
-              <TableCell>Product 1</TableCell>
-              <TableCell>Category A</TableCell>
-              <TableCell>$10.00</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>2</TableCell>
-              <TableCell>Product 2</TableCell>
-              <TableCell>Category B</TableCell>
-              <TableCell>$20.00</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Container>
-    </Box>
-  );
+interface IMyFormProps {
+  name: string;
+  description: string;
+  occurrenceTimestamp: Date;
 }
+
+const MyForm: React.FC<IMyFormProps> = (props: IMyFormProps) => {
+  // set up details for ReactHookForm
+  const {
+    register,
+    control,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    defaultValues: {
+      name: props.name,
+      description: props.description,
+      occurrenceTimestamp: props.occurrenceTimestamp,
+    },
+    mode: "all",
+  });
+
+  const nameRef = useRef(null);
+  const descriptionRef = useRef(null);
+
+  register("name", { required: true });
+  register("description", { required: true });
+
+  return (
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <TextField
+        type="string"
+        label="Name"
+        fullWidth
+        {...register("name", {
+          required: "Required",
+        })}
+      />
+      {errors.name && errors.name.message}
+
+      {/* a text input for Name */}
+      {/* <TextField
+        // inputRef={register('name', { required: true })}
+        inputRef={nameRef}
+        name="name"
+        label="Name"
+        fullWidth
+      /> */}
+
+      {/* a text input for Description */}
+      <TextField
+        // inputRef={register("description", { required: true })}
+        inputRef={descriptionRef}
+        name="description"
+        label="Description"
+        fullWidth
+      />
+
+      {/* The Date/Time Picker */}
+      <Controller
+        render={(props) => (
+          <TextField
+            {...props}
+            type="datetime-local"
+            label="Occurrence Date/Time"
+          />
+        )}
+        name="occurrenceTimestamp"
+        control={control}
+      />
+
+      {/* The Submit Button */}
+      <Button type="submit" variant="contained" color="primary">
+        Submit
+      </Button>
+    </form>
+  );
+};
+
+export default MyForm;
