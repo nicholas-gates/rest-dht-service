@@ -6,7 +6,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TextField,
+  Button,
 } from "@mui/material";
 
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
@@ -16,6 +16,8 @@ import MainLayout from "./layouts/MainLayout";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 
 // create an interface for reading data
 interface ReadingProps {
@@ -31,16 +33,32 @@ interface ReadingsProps {
   readings: ReadingProps[];
 }
 
+interface IFormInput {
+  earliestDate: string;
+  latestDate: string;
+}
+
 export default function DHTTable({ readings }: ReadingsProps) {
   const [earliestDate, setEarliestDate] = useState(null);
   const [latestDate, setLatestDate] = useState(null);
 
-  const handleEarliestDateChange = (date: any) => {
-    setEarliestDate(date);
-  };
+  // const handleEarliestDateChange = (date: any) => {
+  //   setEarliestDate(date);
+  // };
 
-  const handleLatestDateChange = (date: any) => {
-    setLatestDate(date);
+  // const handleLatestDateChange = (date: any) => {
+  //   setLatestDate(date);
+  // };
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      earliestDate: "",
+      latestDate: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+    console.log(data);
   };
 
   return (
@@ -66,21 +84,43 @@ export default function DHTTable({ readings }: ReadingsProps) {
         </TableBody>
       </Table>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DateTimePicker
-          label="Earliest Date"
-          value={earliestDate}
-          onChange={handleEarliestDateChange}
+      {/* <form onSubmit={handleSubmit((data) => console.log(data))}> */}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Controller
+          name="earliestDate"
+          control={control}
+          render={({ field }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Earliest Date"
+                {...field}
+                // value={earliestDate}
+                // onChange={handleEarliestDateChange}
+              />
+            </LocalizationProvider>
+          )}
         />
-      </LocalizationProvider>
 
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DateTimePicker
-          label="Latest Date"
-          value={latestDate}
-          onChange={handleLatestDateChange}
+        <Controller
+          name="latestDate"
+          control={control}
+          render={({ field }) => (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Latest Date"
+                {...field}
+                // value={latestDate}
+                // onChange={handleLatestDateChange}
+              />
+            </LocalizationProvider>
+          )}
         />
-      </LocalizationProvider>
+
+        <Button variant="contained" component="label">
+          Submit
+          <input hidden type="submit" />
+        </Button>
+      </form>
     </MainLayout>
   );
 }
