@@ -38,27 +38,52 @@ interface IFormInput {
   latestDate: string;
 }
 
+interface DateEvent {
+  $d: Date | null;
+}
+
 export default function DHTTable({ readings }: ReadingsProps) {
-  const [earliestDate, setEarliestDate] = useState(null);
-  const [latestDate, setLatestDate] = useState(null);
+  const [earliestDate, setEarliestDate] = useState(new Date());
+  const [latestDate, setLatestDate] = useState(new Date());
 
-  // const handleEarliestDateChange = (date: any) => {
-  //   setEarliestDate(date);
-  // };
+  const [earliestDateError, setEarliestDateError] = useState(false);
+  const [latestDateError, setLatestDateError] = useState(false);
 
-  // const handleLatestDateChange = (date: any) => {
-  //   setLatestDate(date);
-  // };
+  const handleEarliestDateChange = (value: DateEvent | null) => {
+    console.log(`earliestDate: ${earliestDate.toDateString()}`);
+    if (value != null && value.$d != null) {
+      setEarliestDate(value.$d);
+    }
+  };
 
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      earliestDate: "",
-      latestDate: "",
-    },
-  });
+  const handleLatestDateChange = (value: DateEvent | null) => {
+    console.log(`latestDate: ${latestDate}`);
+    if (value != null && value.$d != null) {
+      setLatestDate(value.$d);
+    }
+  };
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+
+    setEarliestDateError(false);
+    setLatestDateError(false);
+
+    if (earliestDate == null) {
+      setEarliestDateError(true);
+    }
+
+    if (latestDate == null) {
+      setLatestDateError(true);
+    }
+
+    if (earliestDate && latestDate) {
+      console.log(earliestDate, latestDate);
+    }
   };
 
   return (
@@ -84,37 +109,22 @@ export default function DHTTable({ readings }: ReadingsProps) {
         </TableBody>
       </Table>
 
-      {/* <form onSubmit={handleSubmit((data) => console.log(data))}> */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Controller
-          name="earliestDate"
-          control={control}
-          render={({ field }) => (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                label="Earliest Date"
-                {...field}
-                // value={earliestDate}
-                // onChange={handleEarliestDateChange}
-              />
-            </LocalizationProvider>
-          )}
-        />
+      <form autoComplete="off" onSubmit={handleSubmit}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Earliest Date"
+            value={{ $d: earliestDate }}
+            onChange={handleEarliestDateChange}
+          />
+        </LocalizationProvider>
 
-        <Controller
-          name="latestDate"
-          control={control}
-          render={({ field }) => (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                label="Latest Date"
-                {...field}
-                // value={latestDate}
-                // onChange={handleLatestDateChange}
-              />
-            </LocalizationProvider>
-          )}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Latest Date"
+            value={{ $d: latestDate }}
+            onChange={handleLatestDateChange}
+          />
+        </LocalizationProvider>
 
         <Button variant="contained" component="label">
           Submit
