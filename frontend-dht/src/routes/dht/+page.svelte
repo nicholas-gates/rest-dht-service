@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { PUBLIC_SHOW_JSON_DEBUG } from '$env/static/public';
+	import type { DhtReading } from '$home/types/DhtReading';
 	import type { DhtReadingsByTimeRangeStore } from '$houdini';
 	import type { Writable } from 'svelte/store';
+  	import Plot from 'svelte-plotly.js';
+	import type * as Plotly from 'plotly.js';
 
 	/* @type { import('./$houdini').PageData } */
 	export let data: Data;
-``
+
 	let DhtReadingsByTimeRange: DhtReadingsByTimeRangeStore, startTs: string, endTs: string, isAuthenticated: Writable<boolean>;
 
 	// console.log('⭐️⭐️⭐️ dht page data', data);
@@ -22,10 +25,40 @@
 
 	$: ({ DhtReadingsByTimeRange, urlSearchParams: {startTs, endTs}, isAuthenticated } = data);
 
+
 	// console.log(data.DhtReadingsByTimeRange)
 
 	const debug = (obj: any, name = '') => {
 		return PUBLIC_SHOW_JSON_DEBUG == '1' ? `${name} ${JSON.stringify(obj, null, 2)}` : '';
+	};
+
+	const shapeChartData = (dhtReadings: unknown) => {
+
+		const x: Plotly.Datum[] = [];
+		const y: Plotly.Datum[] = [];
+
+		if (isDhtReadingArray(dhtReadings)) {
+			dhtReadings.forEach((reading: DhtReading) => {
+				x.push(reading.createdAt);
+				y.push(reading.tempFahr);
+			});
+
+			// console.log('⭐️⭐️⭐️ shapeChartData', [{ x, y }]);
+		}
+
+		const data: Plotly.Data[] = [
+			{
+				x,
+				y,
+				type: 'scatter'
+			}
+		];
+		return data;
+	};
+
+	// create type gaurd to tell typescript that the object is a DhtReading
+	const isDhtReadingArray = (obj: any): obj is DhtReading[] => {
+		return Array.isArray(obj) && obj[0].tempFahr !== undefined;
 	};
 
 </script>
@@ -49,8 +82,18 @@
 				<button type="submit">Submit</button>
 			</form>
 
+			<h2>Chart</h2>
+			<Plot
+				data={shapeChartData($DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange)}
+				layout={{
+					margin: { t: 0 }
+				}}
+				fillParent='width'
+				debounce={250}
+			/>
+
 			<h2>Readings by Time Range</h2>
-			{debug($DhtReadingsByTimeRange, '$DhtReadingsByTimeRange: ')}
+			<!-- {debug($DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange, '$DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange: ')} -->
 			{#each $DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange as reading}
 				<section>
 					<ul>

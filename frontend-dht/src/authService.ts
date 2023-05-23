@@ -37,7 +37,7 @@ function logout(authClient: Auth0Client) {
 
 const setUserDetails = async (authClient: Auth0Client) => {
 	const authuser = await authClient.getUser();
-	console.log(`⭐️⭐️⭐️ authuser: ${JSON.stringify(authuser)}`);
+	// console.log(`⭐️⭐️⭐️ authuser: ${JSON.stringify(authuser)}`);
 
 	if (!authuser) {
 		console.log(`⭐️⭐️⭐️ !authuser`);
@@ -63,10 +63,10 @@ const setUserDetails = async (authClient: Auth0Client) => {
 	user.set(authuser);
 	isAuthenticated.set(true);
 
-	console.log(`⭐️⭐️⭐️ setUserDetails`, {
-		user,
-		isAuthenticated
-	});
+	// console.log(`⭐️⭐️⭐️ setUserDetails`, {
+	// 	user,
+	// 	isAuthenticated
+	// });
 };
 
 const auth = {

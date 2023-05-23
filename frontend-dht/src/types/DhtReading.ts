@@ -1,6 +1,8 @@
 export interface DhtReading {
-	tempFahr: number;
-	tempCel: number;
-	humidity: number;
-	createdAt: string;
+  _id: string;
+  tempFahr: number;
+  tempCel: number;
+  humidity: number;
+  createdAt: any;
+  modifiedAt: any;
 }

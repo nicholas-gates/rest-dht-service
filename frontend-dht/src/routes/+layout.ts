@@ -1,8 +1,7 @@
 import auth from "../authService";
-// import { isAuthenticated, user } from "../store";
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params }) {
+export async function load() {
 
     if (typeof window !== 'undefined') {
         const auth0Client = await auth.createClient();
