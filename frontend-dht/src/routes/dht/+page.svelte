@@ -4,7 +4,10 @@
 	import type { DhtReadingsByTimeRangeStore } from '$houdini';
 	import type { Writable } from 'svelte/store';
   	import Plot from 'svelte-plotly.js';
-	import type * as Plotly from 'plotly.js';
+	// import type * as Plotly from 'plotly.js';
+
+	// alias data type from plotly.js as PlotlyData
+	import type { Datum, Data as PlotlyData } from 'plotly.js';
 
 	/* @type { import('./$houdini').PageData } */
 	export let data: Data;
@@ -34,8 +37,8 @@
 
 	const shapeChartData = (dhtReadings: unknown) => {
 
-		const x: Plotly.Datum[] = [];
-		const y: Plotly.Datum[] = [];
+		const x: Datum[] = [];
+		const y: Datum[] = [];
 
 		if (isDhtReadingArray(dhtReadings)) {
 			dhtReadings.forEach((reading: DhtReading) => {
@@ -46,7 +49,7 @@
 			// console.log('⭐️⭐️⭐️ shapeChartData', [{ x, y }]);
 		}
 
-		const data: Plotly.Data[] = [
+		const data: PlotlyData[] = [
 			{
 				x,
 				y,
