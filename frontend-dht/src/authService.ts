@@ -1,14 +1,14 @@
 import { createAuth0Client, Auth0Client, type PopupLoginOptions } from '@auth0/auth0-spa-js';
 import { user, isAuthenticated, popupOpen } from './store';
-import config from '../auth_config';
+import { PUBLIC_AUTH_DOMAIN, PUBLIC_AUTH_CLIENT_ID } from "$env/static/public";
 
 async function createClient() {
 	let auth0Client = await createAuth0Client({
-		domain: config.domain,
-		clientId: config.clientId,
-		cacheLocation: 'localstorage',
-		useRefreshTokens: true
-	});
+    domain: PUBLIC_AUTH_DOMAIN || '',
+    clientId: PUBLIC_AUTH_CLIENT_ID || '',
+    cacheLocation: "localstorage",
+    useRefreshTokens: true,
+  });
 
 	return auth0Client;
 }
