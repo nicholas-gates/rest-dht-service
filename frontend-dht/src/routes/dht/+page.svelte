@@ -10,13 +10,11 @@
 
 	import {
 		Chart,
-		registerables,
 		Title,
 		Tooltip,
 		Legend,
 		BarController,
 		BarElement,
-		// LineElement,
 		LinearScale,
 		TimeScale,
 		PointElement,
@@ -28,13 +26,11 @@
 	import 'chartjs-adapter-moment'; // Import the Chart.js adapter for moment.js
 
 	Chart.register(
-		// ...registerables,
 		Title,
 		Tooltip,
 		Legend,
 		BarController,
 		BarElement,
-		// LineElement,
 		LinearScale,
 		TimeScale,
 		PointElement,
@@ -105,71 +101,68 @@
 					label: 'Temperature (F)',
 					data: y,
 					backgroundColor: [
-						'hsl(347 38% 49%)',
-						'hsl(346 65% 63%)',
-						'hsl(346 49% 56%)',
-						'hsl(346 89% 70%)',
-						'hsl(346 90% 76%)',
-						'hsl(346 90% 73%)',
-						'hsl(346 89% 79%)',
-						'hsl(346 89% 85%)',
-						'hsl(347 89% 82%)',
-						'hsl(346 90% 88%)',
-						'hsl(347 87% 94%)',
-						'hsl(347 91% 91%)',
-						'hsl(346 87% 97%)'
+						chartColors.bar,
 					],
-					borderColor: ['hsl(43 100% 52%)'],
+					borderColor: [chartColors.barBorder],
 					borderRadius: 4,
 					borderWidth: 2
 				}
 			]
 		};
 
-		console.log('⭐️⭐️⭐️ shapeChartData', chartdata);
+		// console.log('⭐️⭐️⭐️ shapeChartData', chartdata);
 		return chartdata;
 	};
 
-	const options: ChartOptions = {
-		scales: {
-			x: {
-				type: 'time',
-				time: {
-					unit: 'month',
-					tooltipFormat: 'll'
-				},
-				title: {
-					display: true,
-					text: 'Date'
-				}
-			},
-			y: {
-				title: {
-					display: true,
-					text: 'Temp (F)'
-				}
-			}
-		}
-	};
+	// const options: ChartOptions = {
+	// 	scales: {
+	// 		x: {
+	// 			type: 'time',
+	// 			time: {
+	// 				unit: 'month',
+	// 				tooltipFormat: 'll'
+	// 			},
+	// 			title: {
+	// 				display: true,
+	// 				text: 'Date'
+	// 			}
+	// 		},
+	// 		y: {
+	// 			title: {
+	// 				display: true,
+	// 				text: 'Temp (F)'
+	// 			}
+	// 		}
+	// 	}
+	// };
 	// create type gaurd to tell typescript that the object is a DhtReading
 	const isDhtReadingArray = (obj: any): obj is DhtReading[] => {
 		return Array.isArray(obj) && obj[0].tempFahr !== undefined;
 	};
 
+	const chartColors = {
+		canvas: '#1C646D',
+		grid: '#38184C',
+		bar: '#CEF09D',
+		barBorder: '#A0CD60',
+		text: '#A0CD60'
+	}
+
 	onMount(() => {
+
 		if (browser) {
 			new Chart(barChartElement, {
 				type: 'bar',
 				data: shapeChartData($DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange || []),
 				plugins: [
 					{
-						id: 'custom_canvas_background_colour',
+						id: 'custom_canvas_background_color',
 						beforeDraw: (chart: Chart) => {
 							const ctx = chart.canvas.getContext('2d');
 							if (ctx) {
 								ctx.save();
 								ctx.globalCompositeOperation = 'destination-over';
-								ctx.fillStyle = 'hsl(13 46% 25%)';
+								ctx.fillStyle = chartColors.canvas;
 								ctx.fillRect(0, 0, chart.width, chart.height);
 								ctx.restore();
 							}
@@ -185,21 +178,21 @@
 					scales: {
 						x: {
 							grid: {
-								color: 'hsl(43 100% 52% / 10%)'
+								color: chartColors.grid
 							},
-							ticks: { color: 'hsl(43 100% 52% )' }
+							ticks: { color: chartColors.text }
 						},
 						y: {
 							beginAtZero: false,
-							ticks: { color: 'hsl(43 100% 52% )', font: { size: 18 } },
+							ticks: { color: chartColors.text, font: { size: 18 } },
 							grid: {
-								color: 'hsl(43 100% 52% / 40%)'
+								color: chartColors.grid
 							},
 							title: {
 								display: true,
 								text: 'Temperature (F)',
-								color: 'hsl(43 100% 52% )',
-								font: { size: 24, family: 'Merriweather' }
+								color: chartColors.text,
+								font: { size: 24, family: 'Helvetica' }
 							}
 						}
 					}
