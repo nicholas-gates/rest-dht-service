@@ -18,7 +18,7 @@
         "@sveltejs/adapter-auto": "^2.0.0",
         "@sveltejs/adapter-cloudflare": "^2.2.4",
         "@sveltejs/kit": "^1.5.0",
-        "@types/plotly.js": "^2.12.18",
+        "@types/chart.js": "^2.9.37",
         "@typescript-eslint/eslint-plugin": "^5.45.0",
         "@typescript-eslint/parser": "^5.45.0",
         "eslint": "^8.28.0",
@@ -39,7 +39,9 @@
     "dependencies": {
         "@auth0/auth0-spa-js": "^2.0.4",
         "@types/auth0": "^3.3.2",
-        "plotly.js": "^2.23.1",
-        "svelte-plotly.js": "^0.3.2"
+        "chart.js": "^4.3.0",
+        "chartjs-adapter-moment": "^1.0.1",
+        "moment": "^2.29.4",
+        "svelte-chartjs": "^3.1.2"
     }
 }
