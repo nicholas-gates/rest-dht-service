@@ -2,10 +2,7 @@ export const ssr = false;
 
 import { graphql } from '$houdini';
 
-import { error } from '@sveltejs/kit';
-
 import { isAuthenticated, user } from '../../store';
-import type { DhtReading } from '$types/DhtReading';
 import type { HoudiniAfterLoadEvent } from '$types/HoudiniAfterLoadEvent';
 
 export const _houdini_load = graphql(`
@@ -69,8 +66,13 @@ export const _houdini_afterLoad = (
  * @param {*} event
  */
 const getSearchParams = (searchParams: URLSearchParams) => {
-	return {
-		startTs: searchParams.get('startTs') ?? '2021-03-19T00:01:24.697092Z',
-		endTs: searchParams.get('endTs') ?? '2023-06-19T00:01:24.697092Z'
-	};
+  console.log("getSearchParams", {
+    startTs: searchParams.get("startTs") ?? "2021-03-19T00:01:24.697092Z",
+    endTs: searchParams.get("endTs") ?? "2023-06-19T00:01:24.697092Z",
+  });
+
+  return {
+    startTs: searchParams.get("startTs") ?? "2021-03-19T00:01:24.697092Z",
+    endTs: searchParams.get("endTs") ?? "2023-06-19T00:01:24.697092Z",
+  };
 };

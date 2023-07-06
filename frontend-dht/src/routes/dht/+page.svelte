@@ -19,10 +19,11 @@
 		TimeScale,
 		PointElement,
 		CategoryScale,
-		type ChartOptions
+		// type ChartOptions,
+		type ChartItem
+
 	} from 'chart.js';
 
-	// import { Chart, TimeScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
 	import 'chartjs-adapter-moment'; // Import the Chart.js adapter for moment.js
 
 	Chart.register(
@@ -38,6 +39,7 @@
 	);
 
 	let barChartElement: HTMLCanvasElement;
+	let barChart: ChartItem;
 
 	/* @type { import('./$houdini').PageData } */
 	export let data: Data;
@@ -51,7 +53,6 @@
 
 	interface Data {
 		DhtReadingsByTimeRange: DhtReadingsByTimeRangeStore;
-		// DhtReadingsByTimeRange: Writable<DhtReadingsByTimeRangeInterface>;
 		isAuthenticated: Writable<boolean>;
 		urlSearchParams: {
 			startTs: string;
@@ -65,15 +66,34 @@
 		isAuthenticated
 	} = data);
 
+	// $: updateChart();
 	// console.log(data.DhtReadingsByTimeRange)
+
+	function onChartDataChange(dhtReadings: unknown) {
+		if (browser && barChart && barChartElement) {
+			const chartData = shapeChartData(dhtReadings);
+
+			// console.log('⭐️⭐️⭐️ onChartDataChange', dhtReadings);
+			// console.log('⭐️⭐️⭐️ onChartDataChangebarChartElement', barChartElement)
+			// console.log('⭐️⭐️⭐️ onChartDataChangeonMount barChart', barChart)
+			// console.log('⭐️⭐️⭐️ onChartDataChangeonMount barChart.data', barChart.data)
+
+			// Fetch data from the database and replace old data
+			barChart.data.labels = chartData.labels;
+			barChart.data.datasets.forEach((dataset: unknown) => {
+				dataset.data = chartData.datasets[0].data;
+			});
+
+			// Re-render the ChartJS component
+			barChart.update();
+		}
+	}
 
 	const debug = (obj: any, name = '') => {
 		return PUBLIC_SHOW_JSON_DEBUG == '1' ? `${name} ${JSON.stringify(obj, null, 2)}` : '';
 	};
 
 	const shapeChartData = (dhtReadings: unknown) => {
-		// const x: Datum[] = [];
-		// const y: Datum[] = [];
 		const x: String[] = [];
 		const y: Number[] = [];
 
@@ -86,7 +106,6 @@
 			// console.log('⭐️⭐️⭐️ shapeChartData', [{ x, y }]);
 		}
 
-		// const data: PlotlyData[] = [
 		const data = [
 			{
 				x,
@@ -151,7 +170,7 @@
 	onMount(() => {
 
 		if (browser) {
-			new Chart(barChartElement, {
+			barChart = new Chart(barChartElement, {
 				type: 'bar',
 				data: shapeChartData($DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange || []),
 				plugins: [
@@ -198,8 +217,12 @@
 					}
 				}
 			});
+			// console.log('⭐️⭐️⭐️ onMount barChartElement', barChartElement)
+			// console.log('⭐️⭐️⭐️ onMount barChart', barChart)
+
 		}
 	});
+
 </script>
 
 <div>
@@ -212,6 +235,7 @@
 	{:else if $DhtReadingsByTimeRange?.fetching}
 		<div>Loading...</div>
 	{:else if $DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange}
+		{debug({}, `render time: ${new Date().toLocaleString()}`)}
 		<div>
 			<form action="/dht">
 				<label for="start-time">Start Time:</label>
@@ -223,6 +247,7 @@
 
 			<h2>Chart</h2>
 			<canvas bind:this={barChartElement} />
+			{onChartDataChange($DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange)}
 
 			<h2>Readings by Time Range</h2>
 			<!-- {debug($DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange, '$DhtReadingsByTimeRange.data.getDhtReadingsByTimeRange: ')} -->
