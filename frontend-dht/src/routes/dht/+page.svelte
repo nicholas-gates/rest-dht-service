@@ -66,9 +66,6 @@
 		isAuthenticated
 	} = data);
 
-	// $: updateChart();
-	// console.log(data.DhtReadingsByTimeRange)
-
 	function onChartDataChange(dhtReadings: unknown) {
 		if (browser && barChart && barChartElement) {
 			const chartData = shapeChartData(dhtReadings);
@@ -133,27 +130,6 @@
 		return chartdata;
 	};
 
-	// const options: ChartOptions = {
-	// 	scales: {
-	// 		x: {
-	// 			type: 'time',
-	// 			time: {
-	// 				unit: 'month',
-	// 				tooltipFormat: 'll'
-	// 			},
-	// 			title: {
-	// 				display: true,
-	// 				text: 'Date'
-	// 			}
-	// 		},
-	// 		y: {
-	// 			title: {
-	// 				display: true,
-	// 				text: 'Temp (F)'
-	// 			}
-	// 		}
-	// 	}
-	// };
 	// create type gaurd to tell typescript that the object is a DhtReading
 	const isDhtReadingArray = (obj: any): obj is DhtReading[] => {
 		return Array.isArray(obj) && obj[0].tempFahr !== undefined;
@@ -235,7 +211,7 @@
 	{:else if $DhtReadingsByTimeRange?.fetching}
 		<div>Loading...</div>
 	{:else if $DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange}
-		{debug({}, `render time: ${new Date().toLocaleString()}`)}
+		<!-- {debug({}, `render time: ${new Date().toLocaleString()}`)} -->
 		<div>
 			<form action="/dht">
 				<label for="start-time">Start Time:</label>
