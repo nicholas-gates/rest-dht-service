@@ -19,9 +19,10 @@
 		TimeScale,
 		PointElement,
 		CategoryScale,
-		// type ChartOptions,
-		type ChartItem
+		type ChartDataset,
+		type ChartData
 
+		// type ChartOptions,
 	} from 'chart.js';
 
 	import 'chartjs-adapter-moment'; // Import the Chart.js adapter for moment.js
@@ -39,7 +40,7 @@
 	);
 
 	let barChartElement: HTMLCanvasElement;
-	let barChart: ChartItem;
+	let barChart: Chart<'bar'>;
 
 	/* @type { import('./$houdini').PageData } */
 	export let data: Data;
@@ -66,23 +67,19 @@
 		isAuthenticated
 	} = data);
 
-	function onChartDataChange(dhtReadings: unknown) {
+	function onChartDataChange(dhtReadings: DhtReading[]) {
 		if (browser && barChart && barChartElement) {
 			const chartData = shapeChartData(dhtReadings);
 
-			// console.log('⭐️⭐️⭐️ onChartDataChange', dhtReadings);
-			// console.log('⭐️⭐️⭐️ onChartDataChangebarChartElement', barChartElement)
-			// console.log('⭐️⭐️⭐️ onChartDataChangeonMount barChart', barChart)
-			// console.log('⭐️⭐️⭐️ onChartDataChangeonMount barChart.data', barChart.data)
-
-			// Fetch data from the database and replace old data
 			barChart.data.labels = chartData.labels;
-			barChart.data.datasets.forEach((dataset: unknown) => {
-				dataset.data = chartData.datasets[0].data;
+			barChart.data.datasets.forEach((dataset: ChartDataset) => {
+				dataset.data = chartData.datasets[0].data.map((d) => d as [number, number]);
 			});
 
 			// Re-render the ChartJS component
 			barChart.update();
+
+			return '';
 		}
 	}
 
@@ -90,47 +87,63 @@
 		return PUBLIC_SHOW_JSON_DEBUG == '1' ? `${name} ${JSON.stringify(obj, null, 2)}` : '';
 	};
 
-	const shapeChartData = (dhtReadings: unknown) => {
-		const x: String[] = [];
-		const y: Number[] = [];
+	const shapeChartData = (dhtReadings: (DhtReading | null)[]): ChartData<'bar'> => {
+		const x: string[] = [];
+		const y: number[] = [];
 
-		if (isDhtReadingArray(dhtReadings)) {
-			dhtReadings.forEach((reading: DhtReading) => {
-				x.push(reading.createdAt);
-				y.push(reading.tempFahr);
-			});
-
-			// console.log('⭐️⭐️⭐️ shapeChartData', [{ x, y }]);
-		}
-
-		const data = [
-			{
-				x,
-				y
+		dhtReadings.forEach((value: DhtReading | null, index: number, array: (DhtReading | null)[]) => {
+			if (value !== null) {
+				const [xValue, yValue] = [value.createdAt, value.tempFahr];
+				x.push(xValue.toString());
+				y.push(yValue);
 			}
-		];
+		});
 
-		const chartdata = {
+		return {
 			labels: x,
 			datasets: [
 				{
-					label: 'Temperature (F)',
-					data: y,
-					backgroundColor: [
-						chartColors.bar,
-					],
-					borderColor: [chartColors.barBorder],
-					borderRadius: 4,
-					borderWidth: 2
+					data: y.map((value: number | [number, number] | null) => {
+						if (value === null) {
+							return [0, 0];
+						} else if (typeof value === 'number') {
+							return [0, value];
+						} else {
+							return value;
+						}
+					}),
+					backgroundColor: '#007bff'
 				}
 			]
 		};
-
-		// console.log('⭐️⭐️⭐️ shapeChartData', chartdata);
-		return chartdata;
 	};
 
-	// create type gaurd to tell typescript that the object is a DhtReading
+	// const shapeChartData = (dhtReadings: (DhtReading | null)[]): ChartData<'bar'> => {
+	// 	const x: string[] = [];
+	// 	const y: number[] = [];
+
+	// 	dhtReadings
+	// 		.filter((reading: DhtReading | null): reading is DhtReading => reading !== null)
+	// 		.forEach((reading: DhtReading) => {
+	// 			x.push(reading.createdAt);
+	// 			y.push(reading.tempFahr);
+	// 		});
+
+	// 	return {
+	// 		labels: x,
+	// 		datasets: [
+	// 			{
+	// 				label: 'Temperature',
+	// 				data: y.map((temp: number) => [temp, 0]),
+	// 				backgroundColor: 'rgba(255, 99, 132, 0.2)',
+	// 				borderColor: 'rgba(255, 99, 132, 1)',
+	// 				borderWidth: 1
+	// 			}
+	// 		]
+	// 	};
+	// };
+
+	// type gaurd to tell typescript that the object is a DhtReading
 	const isDhtReadingArray = (obj: any): obj is DhtReading[] => {
 		return Array.isArray(obj) && obj[0].tempFahr !== undefined;
 	};
@@ -141,12 +154,11 @@
 		bar: '#CEF09D',
 		barBorder: '#A0CD60',
 		text: '#A0CD60'
-	}
+	};
 
 	onMount(() => {
-
 		if (browser) {
-			barChart = new Chart(barChartElement, {
+			barChart = new Chart<'bar', (number | [number, number] | null)[], unknown>(barChartElement, {
 				type: 'bar',
 				data: shapeChartData($DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange || []),
 				plugins: [
@@ -165,6 +177,8 @@
 					}
 				],
 				options: {
+					responsive: true,
+					maintainAspectRatio: true,
 					plugins: {
 						legend: {
 							display: false
@@ -172,53 +186,124 @@
 					},
 					scales: {
 						x: {
+							ticks: {
+								color: chartColors.text
+							},
 							grid: {
 								color: chartColors.grid
-							},
-							ticks: { color: chartColors.text }
+							}
 						},
 						y: {
-							beginAtZero: false,
-							ticks: { color: chartColors.text, font: { size: 18 } },
+							ticks: {
+								color: chartColors.text
+							},
 							grid: {
 								color: chartColors.grid
-							},
-							title: {
-								display: true,
-								text: 'Temperature (F)',
-								color: chartColors.text,
-								font: { size: 24, family: 'Helvetica' }
 							}
 						}
 					}
 				}
 			});
+			// barChart = new Chart(barChartElement, {
+			// 	type: 'bar',
+			// 	data: shapeChartData($DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange || []),
+			// 	plugins: [
+			// 		{
+			// 			id: 'custom_canvas_background_color',
+			// 			beforeDraw: (chart: Chart) => {
+			// 				const ctx = chart.canvas.getContext('2d');
+			// 				if (ctx) {
+			// 					ctx.save();
+			// 					ctx.globalCompositeOperation = 'destination-over';
+			// 					ctx.fillStyle = chartColors.canvas;
+			// 					ctx.fillRect(0, 0, chart.width, chart.height);
+			// 					ctx.restore();
+			// 				}
+			// 			}
+			// 		}
+			// 	],
+			// 	options: {
+			// 		plugins: {
+			// 			legend: {
+			// 				display: false
+			// 			}
+			// 		},
+			// 		scales: {
+			// 			x: {
+			// 				grid: {
+			// 					color: chartColors.grid
+			// 				},
+			// 				ticks: { color: chartColors.text }
+			// 			},
+			// 			y: {
+			// 				beginAtZero: false,
+			// 				ticks: { color: chartColors.text, font: { size: 18 } },
+			// 				grid: {
+			// 					color: chartColors.grid
+			// 				},
+			// 				title: {
+			// 					display: true,
+			// 					text: 'Temperature (F)',
+			// 					color: chartColors.text,
+			// 					font: { size: 24, family: 'Helvetica' }
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// });
 			// console.log('⭐️⭐️⭐️ onMount barChartElement', barChartElement)
 			// console.log('⭐️⭐️⭐️ onMount barChart', barChart)
-
 		}
 	});
 
+	const isoFormatDate = (ts: string) => {
+		return new Date(ts).toISOString().slice(0, 16);
+	};
 </script>
 
 <div>
 	<!-- {debug($user, 'user: ')} -->
 
 	{#if !$isAuthenticated}
-		<div>
+		<div class="container">
 			<h1>Not Authenticated</h1>
 		</div>
 	{:else if $DhtReadingsByTimeRange?.fetching}
-		<div>Loading...</div>
+		<div class="container">Loading...</div>
 	{:else if $DhtReadingsByTimeRange?.data?.getDhtReadingsByTimeRange}
 		<!-- {debug({}, `render time: ${new Date().toLocaleString()}`)} -->
-		<div>
+		<div class="container">
 			<form action="/dht">
-				<label for="start-time">Start Time:</label>
-				<input type="text" id="start-time" name="startTs" value={startTs} /><br /><br />
-				<label for="end-time">End Time:</label>
-				<input type="text" id="end-time" name="endTs" value={endTs} /><br /><br />
-				<button type="submit">Submit</button>
+				<div
+					style="border: 1px solid gray; border-radius: 5px; padding: 20px; display: inline-block; max-width: 100%;"
+				>
+					<div class="grid" style="display: inline-block; max-width: 100%;">
+						<div>
+							<!-- { console.log('⭐️⭐️⭐️ startTs', (new Date(startTs)).toISOString().slice(0, 16))} -->
+							<label for="start-time">Start Time</label>
+							<input
+								type="datetime-local"
+								id="start-time"
+								name="startTs"
+								value={isoFormatDate(startTs)}
+							/>
+						</div>
+						<div>
+							<label for="end-time">End Time</label>
+							<input
+								type="datetime-local"
+								id="end-time"
+								name="endTs"
+								value={isoFormatDate(endTs)}
+							/>
+						</div>
+						<div style="display: inline-block; max-width: 100%;">
+							<button type="submit" class="btn">Submit</button>
+						</div>
+					</div>
+
+					<div class="grid" />
+				</div>
 			</form>
 
 			<h2>Chart</h2>
